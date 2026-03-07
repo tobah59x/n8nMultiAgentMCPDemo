@@ -1,0 +1,590 @@
+{
+  "name": "MultiAgentEmail-Manual",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "http://smtp4dev/api/Messages/*?mailboxName=Default",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1104,
+        560
+      ],
+      "id": "9501fe3b-83ec-41ea-bee0-7b37cd56d7d8",
+      "name": "Clear Inbox"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Extract the action items from these meeting minutes and return a JSON array with one object per attendee containing their email address and list of tasks. Return only valid JSON, no other text, no markdown backticks.\n\nHere are the meeting minutes:\n\n{{ $json.textContent }}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -192,
+        544
+      ],
+      "id": "eda5c9a0-5d40-4028-aa41-739becfa78e3",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        752
+      ],
+      "id": "179531eb-1120-411b-97db-252a3263dd82",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "KzJaxalmIgUFxhqR",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1bb9d745-e1af-4ab0-9177-50a3aa30250e",
+              "leftValue": "={{ $json.email }}",
+              "rightValue": "legal",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        384,
+        544
+      ],
+      "id": "f294a571-2dc6-46ad-900b-5e8a1fca33fd",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "fromEmail": "n8n@landdev-example.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "Your Action Items - Project Aurora",
+        "emailFormat": "text",
+        "text": "=Dear Team Member,\n\nPlease find below your action items from the Project Aurora meeting:\n\n{{ $json.tasks }}\n\nPlease ensure these are completed before the next meeting.\n\nBest regards,\nProject Aurora Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        416,
+        832
+      ],
+      "id": "29c65bf1-244d-427b-a5fe-15600fb63fa0",
+      "name": "Send Sales/Eng Email",
+      "webhookId": "ac857ff3-0c17-45b3-8e14-962fb7dbfb5e",
+      "credentials": {
+        "smtp": {
+          "id": "et22rpHBDToprHsF",
+          "name": "smtp4dev-SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "n8n@landdev-example.com",
+        "toEmail": "claude@test.com",
+        "subject": "TASK: DocFind Legal Research",
+        "emailFormat": "text",
+        "text": "=Please search the documentation for information relevant to the following legal tasks and email the findings to n8n@landdev-example.com with the subject 'DOCFIND READY':\n\n{{ $json.tasks }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        512,
+        112
+      ],
+      "id": "48e8065a-15ac-410c-9806-41d28b01ba48",
+      "name": "Request Legal Research (email)",
+      "webhookId": "4d2c9b7a-18bd-4a2b-a78d-aa1f2331d800",
+      "credentials": {
+        "smtp": {
+          "id": "et22rpHBDToprHsF",
+          "name": "smtp4dev-SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        960,
+        352
+      ],
+      "id": "6f915e7b-5744-4ea9-9733-e7bba015aee7",
+      "name": "Wait - Poll Research",
+      "webhookId": "11223344-5566-7788-99aa-bbccddeeff00"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -448,
+        832
+      ],
+      "id": "aaeb5260-ffbc-4521-8b9f-ec6c655f9681",
+      "name": "Wait - Poll Minutes",
+      "webhookId": "aabbccdd-eeff-0011-2233-445566778899"
+    },
+    {
+      "parameters": {
+        "resource": "email",
+        "mailboxes": [
+          "INBOX"
+        ],
+        "emailDateRange": {
+          "since": ""
+        },
+        "emailFlags": {},
+        "customLabels": {},
+        "emailSearchFilters": {
+          "subject": "DOCFIND READY"
+        },
+        "includeParts": [
+          "textContent",
+          "headers"
+        ],
+        "limit": 10
+      },
+      "type": "n8n-nodes-imap-enhanced.imapEnhanced",
+      "typeVersion": 1,
+      "position": [
+        736,
+        112
+      ],
+      "id": "d9cabd31-fee3-436a-bfe8-a1025eaa5a10",
+      "name": "Retrieve Research (email)",
+      "alwaysOutputData": true,
+      "credentials": {
+        "imapApi": {
+          "id": "LhrhxhywdaeVTj5Y",
+          "name": "smtp4dev-IMAP"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "resource": "email",
+        "mailboxes": [
+          "INBOX"
+        ],
+        "emailDateRange": {
+          "since": ""
+        },
+        "emailFlags": {},
+        "customLabels": {},
+        "emailSearchFilters": {
+          "subject": "MINUTES READY"
+        },
+        "includeParts": [
+          "textContent",
+          "headers"
+        ],
+        "limit": 5
+      },
+      "type": "n8n-nodes-imap-enhanced.imapEnhanced",
+      "typeVersion": 1,
+      "position": [
+        -656,
+        560
+      ],
+      "id": "cb8cfc73-b4b2-41a8-b91c-b42ebb5cfbd3",
+      "name": "Retrieve Minutes (email)",
+      "retryOnFail": false,
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "imapApi": {
+          "id": "LhrhxhywdaeVTj5Y",
+          "name": "smtp4dev-IMAP"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "859b9e29-387a-44ed-ac5a-f71239da5b80",
+              "leftValue": "={{ $json.envelope.subject }}",
+              "rightValue": "MINUTES READY",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "e349e6a2-8aeb-45e8-8194-3abf069c30a6",
+              "leftValue": "={{ $json.envelope.from[0].address }}",
+              "rightValue": "claude@test.com",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -416,
+        560
+      ],
+      "id": "1cae62fc-4afc-4b34-b03e-31ea3f2e477f",
+      "name": "IF - Minutes Ready?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4d445c77-e4a0-4ec6-addc-2b01e8fd3cbb",
+              "leftValue": "={{ $json.envelope.subject }}",
+              "rightValue": "DOCFIND READY",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "f41f0e9d-ebb0-4726-a2af-1e608ecffa47",
+              "leftValue": "={{ $json.envelope.to[0].address }}",
+              "rightValue": "n8n@landdev-example.com",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        960,
+        112
+      ],
+      "id": "0845d671-1a23-408f-b72d-a0ef3723c6a1",
+      "name": "IF - DOCFIND Ready?"
+    },
+    {
+      "parameters": {
+        "fromEmail": "n8n@landdev-example.com",
+        "toEmail": "legal.counsel@landdev-example.com",
+        "subject": "Your Action Items - Project Aurora (with Research)",
+        "emailFormat": "text",
+        "text": "=Dear Legal Counsel,\n\nPlease find below your action items from the Project Aurora meeting:\n\n{{ $('If').item.json.tasks }}\n\nAdditionally, here is relevant documentation research to support your tasks:\n\n{{ $json.textContent }}\n\nPlease ensure these are completed before the next meeting.\n\nBest regards,\nProject Aurora Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1088,
+        -64
+      ],
+      "id": "7eab58d8-45fb-4c8a-b9fb-c8e63bc4fc3d",
+      "name": "Send Legal Email",
+      "webhookId": "9a2d0feb-7dd8-4402-bcc6-af3c31b3e423",
+      "credentials": {
+        "smtp": {
+          "id": "et22rpHBDToprHsF",
+          "name": "smtp4dev-SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "n8n@landdev-example.com",
+        "toEmail": "claude@test.com",
+        "subject": "TASK: Process Meeting Minutes",
+        "emailFormat": "text",
+        "text": "Please retrieve MeetingMinutes.txt from your Desktop folder and email the contents to n8n@landdev-example.com with the subject: MINUTES READY",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        -880,
+        560
+      ],
+      "id": "0cba3508-f223-49d4-ab51-35ca409882a0",
+      "name": "Ask for Minutes Email",
+      "webhookId": "2ca44b22-fcc4-4954-bb49-ca651a0b3d8c",
+      "credentials": {
+        "smtp": {
+          "id": "et22rpHBDToprHsF",
+          "name": "smtp4dev-SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1104,
+        288
+      ],
+      "id": "e7eb3cd7-baf9-4907-bdc5-a80dfc3e4acc",
+      "name": "When clicking 'Execute workflow'"
+    },
+    {
+      "parameters": {
+        "jsCode": "const parsed = JSON.parse($input.item.json.text);\nreturn parsed.map(item => ({ json: item }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        544
+      ],
+      "id": "d2e9c5ec-2219-48b2-987f-a7b407b6aae5",
+      "name": "Code - Parse Output"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code - Parse Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Request Legal Research (email)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Sales/Eng Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request Legal Research (email)": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Research (email)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait - Poll Research": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Research (email)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait - Poll Minutes": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Minutes (email)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Minutes (email)": {
+      "main": [
+        [
+          {
+            "node": "IF - Minutes Ready?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Research (email)": {
+      "main": [
+        [
+          {
+            "node": "IF - DOCFIND Ready?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Minutes Ready?": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait - Poll Minutes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - DOCFIND Ready?": {
+      "main": [
+        [
+          {
+            "node": "Send Legal Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait - Poll Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask for Minutes Email": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Minutes (email)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Clear Inbox",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear Inbox": {
+      "main": [
+        [
+          {
+            "node": "Ask for Minutes Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Parse Output": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "b18a8e54-40b5-431c-9705-3b944c415e36",
+  "meta": {
+    "instanceId": "43090fb6b29eb5f109fc413baabd10432834c6ab3470ad21e88a5ec1ec74566d"
+  },
+  "id": "FtZ2F3jex02kLh-1i4Fnz",
+  "tags": []
+}
