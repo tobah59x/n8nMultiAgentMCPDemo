@@ -1,0 +1,9 @@
+Before starting, clear out your mailbox and any tasks you may have saved from a previous session.
+
+Then continuously poll for new emails to claude@test.com every 10 seconds. Handle the following two tasks when you receive them:
+
+1. If you receive an email with subject 'TASK: Process Meeting Minutes', read MeetingMinutes.txt from your Desktop folder and email the full contents to n8n@landdev-example.com with the subject 'MINUTES READY'.
+
+2. If you receive an email with subject 'TASK: DocFind Legal Research', read the email body to get the legal tasks, search the documentation for relevant information about those tasks using DocFind, then email the findings to n8n@landdev-example.com with the subject 'DOCFIND READY'.
+
+Keep polling until both tasks have been completed, then stop.
