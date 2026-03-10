@@ -1,0 +1,26 @@
+This file contains the Linux terminal commands used to create a network
+within a Docker container, start up n8n on that network, then start up
+smtp4dev on the same network. You may need to do this in superuser mode,
+depending on how Docker is set up.
+
+To create the network:
+    docker network create n8n-network
+
+To start up n8n:
+    docker run -it --rm --name n8n \
+  --network n8n-network \
+  -p 5678:5678 \
+  -v ~/.n8n:/home/node/.n8n \
+  -v ~/n8nAgentDemo:/home/node/.n8n-files \
+  n8nio/n8n
+
+To start up smtp4dev:
+    docker run -d --name smtp4dev \
+  --network n8n-network \
+  -p 0.0.0.0:3025:25 \
+  -p 0.0.0.0:3143:143 \
+  -p 0.0.0.0:8080:80 \
+  -e ServerOptions__HostName=smtp4dev \
+  -e ServerOptions__ImapPort=143 \
+  -e ServerOptions__AuthenticationRequired=false \
+  rnwood/smtp4dev:v3
