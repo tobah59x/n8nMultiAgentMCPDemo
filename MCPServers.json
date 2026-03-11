@@ -1,0 +1,44 @@
+{
+  "mcpServers": {
+    "MyFiles": {
+      "command": "/home/user/.nvm/versions/node/v24.14.0/bin/npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/home/user/ClaudeStuff/Desktop",
+        "/home/user/ClaudeStuff/Downloads",
+        "/home/user/ClaudeStuff/mcp-server"
+      ]
+    },
+    "DocFind": {
+      "command": "/home/user/.local/bin/uv",
+      "args": [
+        "run",
+        "--frozen",
+        "--with",
+        "mcp[cli],beautifulsoup4",
+        "mcp",
+        "run",
+        "/home/user/ClaudeStuff/mcp-server/main.py"
+      ]
+    },
+"greenmail": {
+  "command": "npx",
+  "args": ["mcp-mail-server"],
+  "env": {
+    "SMTP_HOST": "10.0.0.29",
+    "SMTP_PORT": "3025",
+    "SMTP_SECURE": "false",
+    "IMAP_HOST": "10.0.0.29",
+    "IMAP_PORT": "3143",
+    "IMAP_SECURE": "false",
+    "EMAIL_USER": "claude@test.com",
+    "EMAIL_PASS": "dummy"
+  }
+}
+},
+  "preferences": {
+    "sidebarMode": "chat",
+    "coworkScheduledTasksEnabled": false
+  }
+}
