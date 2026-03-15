@@ -80,7 +80,7 @@ After running them, verify:
 
 1. Open n8n at `http://localhost:5678` and log in
 2. Click **New Workflow** → **Import from file**
-3. Select `MultiAgentEmailFlow.json` — it will save automatically under the file name
+3. Import and save `MultiAgentEmailFlow.json` — it will save automatically under the file name
 4. Set up your credentials inside n8n:
    - **Groq**: add your Groq API key under Credentials
    - **SMTP**: point to `smtp4dev` hostname, port `25`, no authentication
