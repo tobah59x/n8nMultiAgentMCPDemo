@@ -2,7 +2,7 @@
 
 An office-hour demo of a true multi-agent AI system that automatically processes meeting minutes, extracts action items, performs legal research, and emails results to the relevant team members — across two separate machines on the same local network.
 
-This is for a professional education course on agentic AI. It builds on an earlier [demo](https://github.com/tobah59x/n8nTaskExtractorDemo) where the n8n workflow used a single agent to exract tasks, then sent the emails, all from the same machine. Here, a second AI agent on another machine retrieves the minutes, and performs additional documentation research for legal tasks before the workflow sends the final email.
+This is for a professional education course on agentic AI. It builds on an earlier [demo](https://github.com/tobah59x/n8nTaskExtractorDemo) where the n8n workflow used a single agent to exract tasks, then sent the emails, all from the same machine. Here, a second AI agent on another machine with MCP servers retrieves the minutes, and performs additional documentation research for legal tasks before the workflow sends the final email.
 
 ---
 
