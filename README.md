@@ -15,7 +15,7 @@ This is for a professional education course on agentic AI. It builds on an earli
 3. **n8n** passes the minutes to a **Llama model via Groq**, which extracts per-attendee action items, then:
    - Emails action items directly to Sales and Engineering attendees
    - Sends a second task to Claude Desktop requesting legal research via DocFind
-4. **Claude Desktop** searches its local documentation index for information relevant to the legal tasks and emails the findings back to n8n
+4. **Claude Desktop** searches its local documentation index for information regarding the legal tasks and emails the findings back to n8n
 5. **n8n** sends the legal attendee their action items along with the research findings
 
 All inter-agent communication happens via email through **smtp4dev**, a fake SMTP/IMAP server running in Docker. The two AI agents in this system are **Claude Desktop** (file access and documentation research) and a **Llama model on Groq** (task extraction from unstructured text).
